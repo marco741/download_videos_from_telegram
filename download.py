@@ -65,9 +65,9 @@ async def main():
     progress_pool = ProgressPool()
 
     tasks = []
-    async for msg in client.iter_messages(config.CHANNEL_ID, limit=50, search=config.SEARCH_TEXT, wait_time=0):
+    async for msg in client.iter_messages(None, limit=50, search=config.SEARCH_TEXT, wait_time=0):
         if msg.media is not None:
-            tasks.append(client.download_media(msg, file=save_path.joinpath(msg.message), progress_callback=progress_pool(msg.id)))
+            tasks.append(client.download_media(msg, file=save_path.joinpath(msg.message.replace("/", "-")), progress_callback=progress_pool(msg.id)))
 
     await asyncio.gather(*tasks)
 
