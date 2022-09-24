@@ -59,35 +59,14 @@ class ProgressPool:
         self.last_time = current_time
 
 
-# def msg_callback():
-#     last_current = 0
-#     last_time = time.time()
-
-#     def callback(current, total):
-#         nonlocal last_current, last_time
-#         current_time = time.time()
-#         print(f'{current/1024/1024:.1f} of {total/1024/1024:.1f} MB ({current / total:.2%}) --- {(current - last_current) / (current_time - last_time) / 1024 / 1024:.2f} MB/s')
-#         last_time = current_time
-#         last_current = current
-#     return callback
-
-# def make_dirs():
-#     Path(config.VIDEO_DIRECTORY)
-#     save_path = Path(path.join(".", config.VIDEO_DIRECTORY, config.SEARCH_TEXT))
-#     save_path.mkdir(parents=True, exist_ok=True)
-#     return save_path
-
-
 async def main():
     save_path = Path(path.join(".", config.VIDEO_DIRECTORY, config.SEARCH_TEXT))
-    # await client.send_message('me', 'Hello, myself!')
 
     progress_pool = ProgressPool()
 
     tasks = []
     async for msg in client.iter_messages(config.CHANNEL_ID, limit=50, search=config.SEARCH_TEXT, wait_time=0):
         if msg.media is not None:
-            # tasks.append(client.download_media(msg, file=save_path.joinpath(msg.message), progress_callback=msg_callback()))
             tasks.append(client.download_media(msg, file=save_path.joinpath(msg.message), progress_callback=progress_pool(msg.id)))
 
     await asyncio.gather(*tasks)
