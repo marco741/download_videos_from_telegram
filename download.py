@@ -59,17 +59,22 @@ class ProgressPool:
         self.last_time = current_time
 
 
+async def download_media(client, msg, save_path, progress_pool):
+    await client.download_media(msg, file=save_path.joinpath(msg.message.replace("/", "-")), progress_callback=progress_pool(msg.id))
+
 async def main():
     save_path = Path(path.join(".", config.VIDEO_DIRECTORY, config.SEARCH_TEXT))
 
     progress_pool = ProgressPool()
 
     tasks = []
-    async for msg in client.iter_messages(None, limit=50, search=config.SEARCH_TEXT, wait_time=0):
+    messages = await client.get_messages(None, limit=50, search=config.SEARCH_TEXT, wait_time=0)
+    for msg in messages:
         if msg.media is not None:
-            tasks.append(client.download_media(msg, file=save_path.joinpath(msg.message.replace("/", "-")), progress_callback=progress_pool(msg.id)))
+            tasks.append(asyncio.create_task(download_media(client, msg, save_path, progress_pool)))
 
     await asyncio.gather(*tasks)
 
-with client:
-    client.loop.run_until_complete(main())
+if __name__ == "__main__":
+    with client:
+        client.loop.run_until_complete(main())
