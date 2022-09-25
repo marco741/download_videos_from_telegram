@@ -71,7 +71,7 @@ async def main():
     messages = await client.get_messages(None, limit=50, search=config.SEARCH_TEXT, wait_time=0)
     for msg in messages:
         if msg.media is not None:
-            tasks.append(asyncio.create_task(download_media(client, msg, save_path, progress_pool)))
+            tasks.append(download_media(client, msg, save_path, progress_pool))
 
     await asyncio.gather(*tasks)
 
